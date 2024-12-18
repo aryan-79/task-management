@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --clr-primary-400: #6eacda;
+  --clr-primary-600: #03346e;
+  --clr-primary-800: #021526;
+  --clr-background: #ececec;
+  --clr-background-muted: #c8c8c8;
+  --clr-foreground: #131313;
+  --clr-foreground-muted: #363636;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --clr-primary-800: #6eacda;
+    --clr-primary-600: #03346e;
+    --clr-primary-400: #021526;
+    --clr-background: #131313;
+    --clr-background-muted: #333333;
+    --clr-foreground: #ececec;
+    --clr-foreground-muted: #a8a8a8;
+  }
+}
+
+.dark {
+  --clr-primary-800: #6eacda;
+  --clr-primary-600: #03346e;
+  --clr-primary-400: #021526;
+  --clr-background: #131313;
+  --clr-background-muted: #333333;
+  --clr-foreground: #ececec;
+  --clr-foreground-muted: #a8a8a8;
+}
+
+@layer base {
+  * {
+    @apply box-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  input:not([type="radio"], [type="checkbox"], [type="range"]),
+  textarea {
+    @apply border-2 border-primary-800 rounded-md focus:ring-1 focus:border-primary focus:ring-primary dark:border-foreground dark:focus:ring-primary-800 focus-visible:outline-none p-1 w-full bg-transparent;
+  }
+}
+@layer components {
+  .btn {
+    @apply border-none rounded-md flex items-center justify-center min-w-20 h-10 transition-colors duration-300;
+  }
+  .btn-primary {
+    @apply bg-primary-600 text-foreground-muted hover:bg-primary dark:text-foreground;
+  }
+  .form__title {
+    @apply text-3xl font-semibold mb-4;
+  }
+  .form__field {
+    @apply mb-3;
+    > label {
+      @apply block mb-2;
+    }
+    > .error__msg {
+      @apply text-red-400 text-sm;
+    }
+  }
+}
+
+@layer utilities {
+}

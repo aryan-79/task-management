@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: task-management-postgres
+    environment:
+      POSTGRES_DB: task-management
+      POSTGRES_USER: aryan
+      POSTGRES_PASSWORD: aryan79
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aryan -d task-management"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: task-management-backend
+    # environment:
+    #   - DB_HOST=postgres
+    #   - DB_NAME=task-management-postgres
+    #   - DB_USER=aryan
+    #   - DB_PASS=aryan79
+    #   - PORT=5000
+    #   - JWT_SECRET=aryan79secret
+    #   - REFRESH_TOKEN_SECRET=aryanrefreshsecret
+    #   - DATABASE_URL=postgresql://aryan:aryan79@postgres:5432/task-management
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: task-management-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+volumes:
+  postgres-data:
