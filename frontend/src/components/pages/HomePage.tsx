@@ -1,43 +1,40 @@
 import { useState } from "react";
-import TaskItem, { ITaskItem } from "../home/TaskItem";
 import TaskForm from "../modals/TaskForm";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
+import TaskItem from "@/components/home/TaskItem";
+import useTasks from "@/hooks/useTasks";
+import TaskSkeleton from "../home/TaskSkeleton";
 
 const HomePage = () => {
+  const { data, isPending, isError, isFetching } = useTasks();
+
   const [showModal, setShowModal] = useState(false);
-  const taskList: ITaskItem[] = [
-    {
-      id: "1",
-      title: "Task 1",
-      description: "do something",
-      dueDate: "2024/12/12",
-      status: 0,
-    },
-    {
-      id: "2",
-      title: "Task 2",
-      description: "do something",
-      dueDate: "2024/12/12",
-      status: 1,
-    },
-    {
-      id: "3",
-      title: "Task 3",
-      description: "do something",
-      dueDate: "2024/12/12",
-      status: 2,
-    },
-  ];
+  if (isPending) {
+    return (
+      <>
+        <TaskSkeleton />
+        <TaskSkeleton />
+        <TaskSkeleton />
+      </>
+    );
+  }
+  if (isError) {
+    return <div>some error</div>;
+  }
 
   return (
     <>
-      <div className="">
-        {taskList.map((task) => (
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Tasks</h1>
+        {isFetching && <RefreshCw className="animate-spin size-4" />}
+      </div>
+      <div className="space-y-4">
+        {data?.tasks.map((task) => (
           <TaskItem {...task} key={task.id} />
         ))}
       </div>
       <button
-        className="absolute bottom-4 right-2 size-16 rounded-full bg-primary-600 flex justify-center items-center"
+        className="fixed bottom-4 right-2 size-16 rounded-full bg-primary-600 flex justify-center items-center"
         onClick={() => {
           setShowModal(!showModal);
         }}

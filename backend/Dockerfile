@@ -1,8 +1,10 @@
 FROM node:22-alpine
 RUN apk add --no-cache openssl
 WORKDIR /app
-COPY package.json yarn.lock ./
-RUN yarn install
+RUN npm install -g pnpm
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install
+RUN pnpm add -D @types/cors
 COPY . .
 EXPOSE 5000
-CMD ["sh", "-c", "yarn prisma generate && yarn dev"]
+CMD ["sh", "-c", "pnpm prisma generate && pnpm dev"]

@@ -1,0 +1,15 @@
+@baseUrl = http://localhost:5000/api
+# @name loginApi
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "email": "aryan@gmail.com",
+    "password": "Password@123"
+}
+###
+
+@authToken = {{loginApi.response.body.token}}
+# @name getTask
+GET {{baseUrl}}/task
+Authorization: Bearer {{authToken}}

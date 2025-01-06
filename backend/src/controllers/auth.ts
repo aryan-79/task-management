@@ -118,7 +118,10 @@ const reassignAccessToken = async (refreshToken: string) => {
   if (!user || refreshToken !== user.refreshToken)
     throw new AuthError("Failed to Verify Token", "INVALID_TOKEN");
 
-  return generateAccessToken({ id: user.id, email: user.email });
+  return {
+    token: generateAccessToken({ id: user.id, email: user.email }),
+    user: { id: user.id, email: user.email, username: user.username },
+  };
 };
 
 const getCurrentUser = async (token: string) => {

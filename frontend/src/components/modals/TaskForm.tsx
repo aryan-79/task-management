@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import DatePicker from "../ui/DatePicker";
 import { X } from "lucide-react";
 import Select from "../ui/Select";
-import { STATUS } from "../home/TaskItem";
+import useCreateTask from "@/hooks/useCreateTask";
+import { STATUS } from "@/constants/enums";
 
 interface FormProps {
   type: "create" | "edit";
@@ -15,8 +16,8 @@ interface FormProps {
 
 const options = [
   {
-    label: "Ongoing",
-    value: "ONGOING",
+    label: "In Progress",
+    value: "IN_PROGRESS",
   },
   {
     label: "Completed",
@@ -39,11 +40,32 @@ const TaskForm: React.FC<FormProps> = ({
   const [taskName, setTaskName] = useState(name ?? "");
   const [date, setDate] = useState(dueDate ?? "");
   const [taskDescription, setTaskDescription] = useState(description ?? "");
-  const [taskStatus, setTaskStatus] = useState(status?.toString() || "ONGOING");
+  const [taskStatus, setTaskStatus] = useState<
+    Exclude<typeof status, undefined>
+  >(status || "IN_PROGRESS");
+  const { mutate, isSuccess, isPending } = useCreateTask();
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    mutate({
+      name: taskName,
+      description: taskDescription,
+      dueDate: date,
+      status: taskStatus,
+    });
+  };
+  useEffect(() => {
+    if (isSuccess) {
+      close();
+    }
+  }, [close, isSuccess]);
 
   return (
     <div className="h-screen w-full bg-black/50 backdrop-blur-sm grid place-items-center fixed top-0 left-0 z-50">
-      <form className="sm:w-1/2 p-4 bg-background rounded-xl relative sm:max-w-md">
+      <form
+        className="sm:w-1/2 p-4 bg-background rounded-xl relative sm:max-w-md"
+        onSubmit={handleSubmit}
+      >
         <h1 className="font-semibold text-xl text-center">
           {type === "create" ? "Create New Task" : "Edit Task"}
         </h1>
@@ -82,13 +104,17 @@ const TaskForm: React.FC<FormProps> = ({
         <div>
           <label htmlFor="status">Status</label>
           <Select
-            value={taskStatus.toString()}
+            value={taskStatus}
             options={options}
             onChange={setTaskStatus}
             placeholder="Select Status"
           />
         </div>
-        <button type="submit" className="btn btn-primary w-full mt-4">
+        <button
+          type="submit"
+          className="btn btn-primary w-full mt-4"
+          disabled={isPending}
+        >
           {type === "create" ? "Create" : "Confirm"}
         </button>
         <button

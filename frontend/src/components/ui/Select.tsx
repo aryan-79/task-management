@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 interface Props {
   value: string;
   placeholder: string;
-  onChange: (value: string) => void;
+  onChange: (value: any) => void;
   options: { label: string; value: string }[];
 }
 const Select: React.FC<Props> = ({ value, placeholder, onChange, options }) => {

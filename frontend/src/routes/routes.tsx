@@ -3,19 +3,33 @@ import LoginPage from "@/components/pages/LoginPage";
 import SignupPage from "@/components/pages/SignupPage";
 import HomePage from "@/components/pages/HomePage";
 import Layout from "@/components/common/Layout";
+import RequireAuth from "@/components/common/RequireAuth";
+import AuthLayout from "@/components/common/AuthLayout";
 
 export const routes = createBrowserRouter([
   {
     path: "/login",
-    element: <LoginPage />,
+    element: (
+      <AuthLayout>
+        <LoginPage />
+      </AuthLayout>
+    ),
   },
   {
     path: "/signup",
-    element: <SignupPage />,
+    element: (
+      <AuthLayout>
+        <SignupPage />
+      </AuthLayout>
+    ),
   },
   {
     path: "/",
-    element: <Layout />,
+    element: (
+      <RequireAuth>
+        <Layout />
+      </RequireAuth>
+    ),
     children: [
       { index: true, element: <HomePage /> },
       {

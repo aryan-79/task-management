@@ -131,7 +131,7 @@ router.get("/", async (req: AutheticatedRequest, res: Response) => {
       sortBy,
       sortOrder,
     });
-    res.status(200).json({ tasks });
+    res.status(200).json(tasks);
   } catch (error) {
     if (error instanceof DatabaseError) {
       res.status(500).json({ message: "Database Error", error: error.name });

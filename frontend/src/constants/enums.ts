@@ -1,0 +1,5 @@
+export enum STATUS {
+  IN_PROGRESS,
+  COMPLETED,
+  OVERDUE,
+}
