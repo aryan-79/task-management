@@ -74,7 +74,7 @@ const SignupForm = () => {
       {error && <p>{error.message}</p>}
       <p className="text-center mt-6">
         Already have an account?{" "}
-        <Link to="/login" className="text-primary-600 hover:text-primary-800">
+        <Link to="/login" className="text-blue-600 hover:text-blue-400">
           Login
         </Link>
       </p>

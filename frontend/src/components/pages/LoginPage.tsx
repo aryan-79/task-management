@@ -54,7 +54,7 @@ const LoginForm = () => {
       </button>
       <p className="text-center mt-6">
         Don&apos;t have an account?{" "}
-        <Link to="/signup" className="text-blue-500 hover:text-primary-800">
+        <Link to="/signup" className="text-blue-500 hover:text-blue-300">
           Sign up
         </Link>
       </p>

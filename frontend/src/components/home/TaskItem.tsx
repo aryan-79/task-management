@@ -1,15 +1,32 @@
 import { cn } from "@/utils/cn";
 import { MoreVertical } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TaskForm from "../modals/TaskForm";
 import { useOutsideClick } from "@/hooks/useClickOutside";
 import { Task } from "@/types/api-response";
+import useUpdateTask from "@/hooks/useUpdateTask";
 
-const TaskItem: React.FC<Task> = ({ name, description, dueDate, status }) => {
+const TaskItem: React.FC<Task> = ({
+  id,
+  name,
+  description,
+  dueDate,
+  status,
+}) => {
   const [showOption, setShowOption] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const optionsRef = useRef<HTMLUListElement>(null);
   useOutsideClick(optionsRef, () => setShowOption(false));
+  const { mutate, isSuccess, isPending } = useUpdateTask();
+
+  const handleTaskComplete = () => {
+    if (id) {
+      mutate({ id, status: "COMPLETED" });
+    }
+  };
+  useEffect(() => {
+    if (isSuccess) setShowOption(false);
+  }, [isSuccess]);
   return (
     <div className="border border-background-muted p-4 rounded-md shadow-sm space-y-2">
       <div className="flex justify-between items-center relative">
@@ -22,18 +39,24 @@ const TaskItem: React.FC<Task> = ({ name, description, dueDate, status }) => {
             className="absolute right-2 top-full w-max rounded-sm bg-background-muted"
             ref={optionsRef}
           >
-            <li
-              className="cursor-pointer hover:bg-foreground-muted hover:text-white dark:hover:text-black p-2"
-              onClick={() => {
-                setShowEditModal(!showEditModal);
-                setShowOption(false);
-              }}
-            >
-              Edit
-            </li>
             <li className="cursor-pointer hover:bg-foreground-muted hover:text-white dark:hover:text-black p-2">
-              Mark as Completed
+              <button
+                className="w-full"
+                onClick={() => {
+                  setShowEditModal(!showEditModal);
+                  setShowOption(false);
+                }}
+              >
+                Edit
+              </button>
             </li>
+            {status !== "COMPLETED" && (
+              <li className="cursor-pointer hover:bg-foreground-muted hover:text-white dark:hover:text-black p-2">
+                <button className="w-full" onClick={handleTaskComplete}>
+                  {isPending ? "Updating status" : "Mark as Completed"}
+                </button>
+              </li>
+            )}
           </ul>
         )}
       </div>
@@ -54,6 +77,7 @@ const TaskItem: React.FC<Task> = ({ name, description, dueDate, status }) => {
       </div>
       {showEditModal && (
         <TaskForm
+          id={id}
           type="edit"
           name={name}
           description={description}

@@ -4,9 +4,11 @@ import { X } from "lucide-react";
 import Select from "../ui/Select";
 import useCreateTask from "@/hooks/useCreateTask";
 import { STATUS } from "@/constants/enums";
+import useUpdateTask from "@/hooks/useUpdateTask";
 
 interface FormProps {
   type: "create" | "edit";
+  id?: number;
   name?: string;
   description?: string;
   dueDate?: string;
@@ -30,6 +32,7 @@ const options = [
 ];
 
 const TaskForm: React.FC<FormProps> = ({
+  id,
   type,
   name,
   description,
@@ -43,22 +46,42 @@ const TaskForm: React.FC<FormProps> = ({
   const [taskStatus, setTaskStatus] = useState<
     Exclude<typeof status, undefined>
   >(status || "IN_PROGRESS");
-  const { mutate, isSuccess, isPending } = useCreateTask();
+  const {
+    mutate: create,
+    isSuccess: isCreateSuccess,
+    isPending: isCreatePending,
+  } = useCreateTask();
+  const {
+    mutate: update,
+    isSuccess: isUpdateSuccess,
+    isPending: isUpdatePending,
+  } = useUpdateTask();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    mutate({
-      name: taskName,
-      description: taskDescription,
-      dueDate: date,
-      status: taskStatus,
-    });
+    if (type === "create") {
+      create({
+        name: taskName,
+        description: taskDescription,
+        dueDate: date,
+        status: taskStatus,
+      });
+    } else if (type === "edit") {
+      if (!id) return;
+      update({
+        id,
+        name: taskName,
+        description: taskDescription,
+        dueDate: date,
+        status: taskStatus,
+      });
+    }
   };
   useEffect(() => {
-    if (isSuccess) {
+    if (isCreateSuccess || isUpdateSuccess) {
       close();
     }
-  }, [close, isSuccess]);
+  }, [close, isUpdateSuccess, isCreateSuccess]);
 
   return (
     <div className="h-screen w-full bg-black/50 backdrop-blur-sm grid place-items-center fixed top-0 left-0 z-50">
@@ -113,7 +136,7 @@ const TaskForm: React.FC<FormProps> = ({
         <button
           type="submit"
           className="btn btn-primary w-full mt-4"
-          disabled={isPending}
+          disabled={isCreatePending || isUpdatePending}
         >
           {type === "create" ? "Create" : "Confirm"}
         </button>
