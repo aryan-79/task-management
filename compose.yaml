@@ -1,35 +1,27 @@
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:17-alpine  # 17 is very new, 16 is more stable
     container_name: task-management-postgres
     environment:
       POSTGRES_DB: task-management
       POSTGRES_USER: aryan
-      POSTGRES_PASSWORD: aryan79
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+      POSTGRES_PASSWORD: aryan79  # Use environment variable for security
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U aryan -d task-management"]
-      interval: 1m30s
-      timeout: 30s
+      interval: 10s  # Shorter interval for development
+      timeout: 5s    # Shorter timeout
       retries: 5
-      start_period: 30s
+      start_period: 10s
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: task-management-backend
-    # environment:
-    #   - DB_HOST=postgres
-    #   - DB_NAME=task-management-postgres
-    #   - DB_USER=aryan
-    #   - DB_PASS=aryan79
-    #   - PORT=5000
-    #   - JWT_SECRET=aryan79secret
-    #   - REFRESH_TOKEN_SECRET=aryanrefreshsecret
-    #   - DATABASE_URL=postgresql://aryan:aryan79@postgres:5432/task-management
     env_file:
       - ./backend/.env
     ports:
@@ -39,7 +31,9 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
-      - /app/node_modules
+      - /app/node_modules  # Anonymous volume for node_modules
+    restart: unless-stopped  # Add restart policy
+
   frontend:
     build:
       context: ./frontend
@@ -52,5 +46,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    restart: unless-stopped
+
 volumes:
   postgres-data:
